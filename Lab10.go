@@ -12,6 +12,7 @@ func main() {
 	fmt.Println("Slice = ", b, "Len = ", len(b), ", cap  = ", cap(b))
 	b[0] = "aa"
 	b[1] = "bb"
+	//b[2] = "bb"  //will give error
 	b = append(b, "cc")
 	b = append(b, "dd")
 	b = append(b, "ee")
