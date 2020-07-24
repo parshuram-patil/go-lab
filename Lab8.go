@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
+	empList := emp.EmpList{}
 	empData := emp.Employee{}
 	/* fmt.Println("Enter Employee Details")
 	fmt.Scan(&empData.Empno)
@@ -14,11 +15,12 @@ func main() {
 	empData.Ename = "Parshuram"
 	empData.ESalary = 1234.5
 	//emp.EmpList.Create(empData)
-	empList := emp.EmpList{}
 	empList.Create(empData)
+
 	empData.Empno = 2
-	empData.Ename = "Sidhant"
+	empData.Ename = "Siddhant"
 	empData.ESalary = 1111.5
 	empList.Create(empData)
+
 	empList.Print()
 }
