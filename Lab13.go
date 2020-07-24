@@ -24,7 +24,7 @@ func main() {
 			panic(err)
 		}
 		fmt.Println("String ---> ", string(body))
-		fmt.Println("Map ---> ", data["data"]["id"])
+		fmt.Println("Map ---> ", data["data"])
 	}
 
 }
