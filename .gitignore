@@ -16,3 +16,6 @@
 
 # IDE's
 .idea/
+
+#3rd party dependencies - not a good way
+/src/github.com/*
