@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+func IsClosed(ch <-chan string) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+	}
+
+	return false
+}
+
 func reader(c chan string) {
 	for i := 1; i <= 5; i++ {
 		fmt.Println("Reader - in count ", i)
@@ -20,8 +30,8 @@ func reader(c chan string) {
 		fmt.Println("in reader ", msg)
 	}
 
+	fmt.Println("--->", IsClosed(c))
 	fmt.Println("*** reader End")
-
 }
 
 func writer(c chan string) {
@@ -33,6 +43,8 @@ func writer(c chan string) {
 	}
 
 	fmt.Println("*** writer End")
+	fmt.Println("--->", IsClosed(c))
+	close(c)
 
 }
 func main() {
