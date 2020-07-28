@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>jQuery Hello World</title>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+ $("#msgid").html("This is Hello World by JQuery");
+ $.post("http://localhost:8085/emp",
+ "{\"emp_id\" :\"11\",\"emp_name\":\"AAA\",\"emp_salary\":22111.11}",
+    function(data, textStatus, jqXHR)
+    {
+        console.log(data)
+        alert("sent to server ---> ", data.emp_salary)
+    }).fail(function(jqXHR, textStatus, errorThrown) 
+    {
+        alert(textStatus);
+    });
+
+});
+
+</script>
+
+This is Hello World by HTML
+
+<div id="msgid">
+</div>
+
+</body>
+</html>
