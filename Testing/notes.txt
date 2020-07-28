@@ -9,3 +9,6 @@ go test .\Testing\Lab22_test.go .\Testing\Lab22.go -coverprofile .\Testing\tmp.t
 
 //converting saved profile to html pages
 go tool cover -html=".\Testing\tmp.txt" -o ".\Testing\tmp.html"
+
+// not working this - run from VS code
+go test  -bench=.
