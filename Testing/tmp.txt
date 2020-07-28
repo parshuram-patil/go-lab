@@ -1,0 +1,3 @@
+mode: set
+D:\PSP\GoLang\Training\go-lab\Testing\Lab22.go:5.28,8.2 2 1
+D:\PSP\GoLang\Training\go-lab\Testing\Lab22.go:9.13,12.2 2 0
