@@ -5,25 +5,32 @@ import (
 	"testing"
 )
 
-/* func TestMain(t *testing.T) {
-	main()
-} */
+func TestDivide(t *testing.T) {
+	t.Run("testdivide1", func(t *testing.T) {
+		fmt.Println("testdivide1")
+		x := divide("40", "20")
+		if x != 2 {
+			t.Error("Invalid Divide with 40,20")
+		}
+	})
+	t.Run("testdivide2", func(t *testing.T) {
+		fmt.Println("testdivide2")
+		x := divide("40a", "20")
+		if x != 0 {
+			t.Error("Invalid Divide for 40a and 20")
+		}
+	})
 
-func TestDivideSuccess(t *testing.T) {
-	x := divide("10", "5")
-	if x != 2 {
-		t.Error("Invalid Sum")
-	}
 }
 
-func TestDivideAtoi(t *testing.T) {
-	x := divide("10a", "5")
+func TestDivide3(t *testing.T) {
+	x := divide("", "20")
 	if x != 0 {
-		t.Error("Invalid Sum")
+		t.Error("Invalid Divide '' and 20 ")
 	}
 }
 
-func TestDivideByZero(t *testing.T) {
+func TestDivide4(t *testing.T) {
 	defer func() {
 		fmt.Println("end of main")
 		r := recover()
