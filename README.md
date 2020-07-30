@@ -2,7 +2,7 @@
 
 ### Steps (using power shell)
 
-1. $env:GOPATH = "\<path-till-clonned-repo\>\go-lab"
+1. $env:GOPATH="\<path-till-clonned-repo\>\go-lab"
   
 2. go run .\Lab1.go 
 
