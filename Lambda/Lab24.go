@@ -16,7 +16,7 @@ type MyEvent struct {
 }
 
 type MyResponse struct {
-	Message string `json:"Answer:"`
+	Message string `json:"answer"`
 }
 
 func hello(event MyEvent) (MyResponse, error) {
