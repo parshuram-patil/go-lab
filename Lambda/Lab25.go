@@ -22,15 +22,15 @@ func main() {
 		// fmt.Println(sess)
 		client := lambda.New(sess)
 
-		// type MyRequest struct {
-		// 	Name string `json:"uname"`
-		// 	Age  int    `json:"uage"`
-		// }
-
-		// request := MyRequest{
-		// 	Name: "Check",
-		// 	Age:  3333,
-		// }
+		/* type MyRequest struct {
+			Name string `json:"uname"`
+			Age  int    `json:"uage"`
+		}
+		request := MyRequest{
+			Name: "Check",
+			Age:  3333,
+		}
+		payload, err := json.Marshal(request) */
 
 		payload, err := json.Marshal(map[string]interface{}{
 			"uname": "Parshuram",
