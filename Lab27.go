@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -29,28 +28,43 @@ func main() {
 	} else {
 		svc := s3.New(sess)
 		input := &s3.ListObjectsInput{
-			Bucket: aws.String("psp-cross-acc-test"),
-			// MaxKeys: aws.Int64(2),
+			Bucket:  aws.String("psp-cross-acc-test"),
+			MaxKeys: aws.Int64(2),
 		}
 
-		result, err := svc.ListObjects(input)
+		// result, err := svc.ListObjects(input)
+		// if err != nil {
+		// 	if aerr, ok := err.(awserr.Error); ok {
+		// 		switch aerr.Code() {
+		// 		case s3.ErrCodeNoSuchBucket:
+		// 			fmt.Println(s3.ErrCodeNoSuchBucket, aerr.Error())
+		// 		default:
+		// 			fmt.Println(aerr.Error())
+		// 		}
+		// 	} else {
+		// 		// Print the error, cast err to awserr.Error to get the Code and
+		// 		// Message from an error.
+		// 		fmt.Println(err.Error())
+		// 	}
+		// 	return
+		// }
+
+		// fmt.Println(result)
+
+		pageCnt := 0
+		err := svc.ListObjectsPages(input,
+			func(page *s3.ListObjectsOutput, lastPage bool) bool {
+				pageCnt++
+				fmt.Println(page)
+				// reading only first Page
+				// return pageCnt < 1
+				return true
+			})
 		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				switch aerr.Code() {
-				case s3.ErrCodeNoSuchBucket:
-					fmt.Println(s3.ErrCodeNoSuchBucket, aerr.Error())
-				default:
-					fmt.Println(aerr.Error())
-				}
-			} else {
-				// Print the error, cast err to awserr.Error to get the Code and
-				// Message from an error.
-				fmt.Println(err.Error())
-			}
-			return
+			fmt.Println("Error Paginating bueckt")
+		} else {
+			fmt.Printf("\n\n Done reading %d pages\n", pageCnt)
 		}
-
-		fmt.Println(result)
 	}
 }
 
