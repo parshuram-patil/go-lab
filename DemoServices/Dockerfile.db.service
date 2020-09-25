@@ -1,0 +1,23 @@
+FROM golang:1.15
+
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG HOST_PORT=8092
+
+ENV AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+ENV HOST_PORT $HOST_PORT
+
+RUN mkdir -p /go/src/app
+WORKDIR /go/src/app
+
+RUN go version
+RUN git --version
+
+COPY Lab29.go Common.go /go/src/app/
+
+RUN go get
+
+EXPOSE $HOST_PORT
+
+CMD [ "go", "run", "Lab29.go", "Common.go" ]
