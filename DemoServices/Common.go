@@ -63,18 +63,18 @@ func setHealthStatus(status string) HealthStatus {
 func HeathHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	switch r.Method {
-
-	case "GET":
-		json.NewEncoder(w).Encode(getHealthStatus())
-
 	case "POST":
 		status := r.URL.Query()["status"]
 		if len(status) > 0 {
 			setHealthStatus(status[0])
-			w.WriteHeader(500)
 		}
-		json.NewEncoder(w).Encode(getHealthStatus())
 	}
+
+	heathStatus := getHealthStatus()
+	if heathStatus.Status != CONST_STATUS_UP {
+		w.WriteHeader(500)
+	}
+	json.NewEncoder(w).Encode(getHealthStatus())
 }
 
 func getEvn(varName, defaultvalue string) string {
