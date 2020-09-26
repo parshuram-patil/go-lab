@@ -52,6 +52,7 @@ func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
 
 func registraionDaoService() {
 	http.HandleFunc("/registration", RegistrationDaoHandler)
+	http.HandleFunc("/health", HeathHandler)
 	HOST_PORT := getEvn("HOST_PORT", "8092")
 	fmt.Printf("sever starting on " + HOST_PORT + "\n")
 	log.Fatal(http.ListenAndServe(":"+HOST_PORT, nil))

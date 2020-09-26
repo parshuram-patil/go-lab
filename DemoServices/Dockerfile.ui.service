@@ -12,6 +12,8 @@ ENV HOST_PORT $HOST_PORT
 ENV DB_SERVICE_HOST $DB_SERVICE_HOST
 ENV DB_SERVICE_POST $DB_SERVICE_POST
 
+HEALTHCHECK --interval=5s --timeout=2s --retries=3 CMD curl --fail --silent http://localhost:$HOST_PORT/health || exit 1
+
 RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
 

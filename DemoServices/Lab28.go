@@ -61,6 +61,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 
 func registraionService() {
 	http.HandleFunc("/registration", RegistrationHandler)
+	http.HandleFunc("/health", HeathHandler)
 	var HOST_PORT = getEvn("HOST_PORT", "8091")
 	fmt.Printf("sever starting on " + HOST_PORT + "\n")
 	log.Fatal(http.ListenAndServe(":"+HOST_PORT, nil))
