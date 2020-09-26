@@ -71,6 +71,7 @@ func HeathHandler(w http.ResponseWriter, r *http.Request) {
 		status := r.URL.Query()["status"]
 		if len(status) > 0 {
 			setHealthStatus(status[0])
+			os.Exit(2)
 		}
 		json.NewEncoder(w).Encode(getHealthStatus())
 	}
