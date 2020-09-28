@@ -14,7 +14,7 @@ import (
 )
 
 func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	HandleCORS(w, r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	var regRequest RegRequest
 	json.Unmarshal(reqBody, &regRequest)
@@ -51,7 +51,7 @@ func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	HandleCORS(w, r)
 	email := r.URL.Query()["email"]
 	if len(email) > 0 {
 		sess, err := session.NewSession(&aws.Config{

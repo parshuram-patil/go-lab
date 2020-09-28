@@ -87,3 +87,13 @@ func getEvn(varName, defaultvalue string) string {
 		return defaultvalue
 	}
 }
+
+func HandleCORS(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	if r.Method == "OPTIONS" {
+		return
+	}
+}

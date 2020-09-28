@@ -10,7 +10,7 @@ import (
 )
 
 func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	HandleCORS(w, r)
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("Error reading request body")
@@ -60,7 +60,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	HandleCORS(w, r)
 	email := r.URL.Query()["email"]
 	if len(email) > 0 {
 		var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
