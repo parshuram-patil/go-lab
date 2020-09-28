@@ -13,6 +13,7 @@ type RegRequest struct {
 	LastName  string `json:"lastName"`
 	FullName  string `json:"fullName"`
 	Title     string `json:"title"`
+	Company   string `json:"company"`
 	Email     string `json:"email"`
 	Address   string `json:"address"`
 	Phone     string `json:"phone"`
@@ -23,6 +24,7 @@ type GetUserResponse struct {
 	LastName  string `json:"lastName"`
 	FullName  string `json:"fullName"`
 	Title     string `json:"title"`
+	Company   string `json:"company"`
 	Email     string `json:"email"`
 	Address   string `json:"address"`
 	Phone     string `json:"phone"`
