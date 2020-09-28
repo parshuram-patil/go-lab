@@ -32,7 +32,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	var DB_SERVICE_PORT = getEvn("DB_SERVICE_PORT", "8092")
 	resp, err := http.Post("http://"+DB_SERVICE_HOST+":"+DB_SERVICE_PORT+"/registration", "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
-		fmt.Println("Error calling DAO service")
+		fmt.Println("Error calling registration API")
 		errMsg := err.Error()
 		fmt.Println(errMsg)
 		errResponse := ErrorResponse{
@@ -59,9 +59,57 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func UserHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	email := r.URL.Query()["email"]
+	if len(email) > 0 {
+		var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
+		var DB_SERVICE_PORT = getEvn("DB_SERVICE_PORT", "8092")
+		resp, err := http.Get("http://" + DB_SERVICE_HOST + ":" + DB_SERVICE_PORT + "/user?email=" + email[0])
+		if err != nil {
+			fmt.Println("Error calling user API")
+			errMsg := err.Error()
+			fmt.Println(errMsg)
+			errResponse := ErrorResponse{
+				Error: string(errMsg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+			return
+		}
+
+		defer resp.Body.Close()
+		respBody, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			fmt.Println("Error reading GetUSer response")
+			errMsg := err.Error()
+			fmt.Println(err.Error())
+			w.WriteHeader(500)
+			errResponse := ErrorResponse{
+				Error: string(errMsg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+			return
+		}
+
+		var user GetUserResponse
+		json.Unmarshal(respBody, &user)
+		json.NewEncoder(w).Encode(user)
+
+	} else {
+		w.WriteHeader(500)
+		errResponse := ErrorResponse{
+			Error: "No User Email found in URL",
+		}
+		json.NewEncoder(w).Encode(errResponse)
+	}
+
+}
+
 func registraionService() {
 	http.HandleFunc("/registration", RegistrationHandler)
 	http.HandleFunc("/health", HeathHandler)
+	http.HandleFunc("/user", UserHandler)
 	var HOST_PORT = getEvn("HOST_PORT", "8091")
 	fmt.Printf("sever starting on " + HOST_PORT + "\n")
 	log.Fatal(http.ListenAndServe(":"+HOST_PORT, nil))

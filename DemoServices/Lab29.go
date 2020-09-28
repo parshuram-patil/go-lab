@@ -50,9 +50,71 @@ func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func UserHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	email := r.URL.Query()["email"]
+	if len(email) > 0 {
+		sess, err := session.NewSession(&aws.Config{
+			Region: aws.String("eu-west-1"),
+		})
+		if err != nil {
+			fmt.Println("Error Creating AWS session")
+			fmt.Println(err.Error())
+		}
+
+		svc := dynamodb.New(sess)
+		result, err := svc.GetItem(&dynamodb.GetItemInput{
+			TableName: aws.String("registration"),
+			Key: map[string]*dynamodb.AttributeValue{
+				"email": {
+					S: aws.String(email[0]),
+				},
+			},
+		})
+		if err != nil {
+			errMsg := err.Error()
+			fmt.Println(errMsg)
+			w.WriteHeader(500)
+			errResponse := ErrorResponse{
+				Error: string(errMsg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+			return
+		}
+		if result.Item == nil {
+			msg := "Could not find '" + email[0] + "'"
+			errResponse := ErrorResponse{
+				Error: string(msg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+		}
+
+		var userRecord GetUserResponse
+		err = dynamodbattribute.UnmarshalMap(result.Item, &userRecord)
+		if err != nil {
+			errMsg := err.Error()
+			fmt.Println(errMsg)
+			w.WriteHeader(500)
+			errResponse := ErrorResponse{
+				Error: string(errMsg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+		} else {
+			json.NewEncoder(w).Encode(userRecord)
+		}
+	} else {
+		w.WriteHeader(500)
+		errResponse := ErrorResponse{
+			Error: "No User Email found in URL",
+		}
+		json.NewEncoder(w).Encode(errResponse)
+	}
+}
+
 func registraionDaoService() {
 	http.HandleFunc("/registration", RegistrationDaoHandler)
 	http.HandleFunc("/health", HeathHandler)
+	http.HandleFunc("/user", UserHandler)
 	HOST_PORT := getEvn("HOST_PORT", "8092")
 	fmt.Printf("sever starting on " + HOST_PORT + "\n")
 	log.Fatal(http.ListenAndServe(":"+HOST_PORT, nil))
