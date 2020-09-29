@@ -14,7 +14,14 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Println("Error reading request body")
-		fmt.Println(err.Error())
+		errMsg := err.Error()
+		fmt.Println(errMsg)
+		w.WriteHeader(500)
+		errResponse := ErrorResponse{
+			Error: string(errMsg),
+		}
+		json.NewEncoder(w).Encode(errResponse)
+		return
 	}
 
 	var regRequest RegRequest
@@ -25,7 +32,14 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	reqBody, err = json.Marshal(regRequest)
 	if err != nil {
 		fmt.Println("Error preparing DAO data")
-		fmt.Println(err.Error())
+		errMsg := err.Error()
+		fmt.Println(errMsg)
+		w.WriteHeader(500)
+		errResponse := ErrorResponse{
+			Error: string(errMsg),
+		}
+		json.NewEncoder(w).Encode(errResponse)
+		return
 	}
 
 	var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
@@ -35,6 +49,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error calling registration API")
 		errMsg := err.Error()
 		fmt.Println(errMsg)
+		w.WriteHeader(500)
 		errResponse := ErrorResponse{
 			Error: string(errMsg),
 		}
@@ -48,7 +63,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error DAO response")
 		errMsg := err.Error()
-		fmt.Println(err.Error())
+		fmt.Println(errMsg)
 		w.WriteHeader(500)
 		errResponse := ErrorResponse{
 			Error: string(errMsg),
@@ -66,10 +81,12 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
 		var DB_SERVICE_PORT = getEvn("DB_SERVICE_PORT", "8092")
 		resp, err := http.Get("http://" + DB_SERVICE_HOST + ":" + DB_SERVICE_PORT + "/user?email=" + email[0])
+
 		if err != nil {
 			fmt.Println("Error calling user API")
 			errMsg := err.Error()
 			fmt.Println(errMsg)
+			w.WriteHeader(500)
 			errResponse := ErrorResponse{
 				Error: string(errMsg),
 			}
@@ -80,10 +97,17 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		defer resp.Body.Close()
 		respBody, err := ioutil.ReadAll(resp.Body)
 
+		if resp.StatusCode != 200 {
+			fmt.Println("Error from DB Service")
+			w.WriteHeader(500)
+			fmt.Fprint(w, string(respBody))
+			return
+		}
+
 		if err != nil {
 			fmt.Println("Error reading GetUSer response")
 			errMsg := err.Error()
-			fmt.Println(err.Error())
+			fmt.Println(errMsg)
 			w.WriteHeader(500)
 			errResponse := ErrorResponse{
 				Error: string(errMsg),

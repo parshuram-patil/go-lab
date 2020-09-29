@@ -24,7 +24,14 @@ func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		fmt.Println("Error Creating AWS session")
-		fmt.Println(err.Error())
+		errMsg := err.Error()
+		fmt.Println(errMsg)
+		w.WriteHeader(500)
+		errResponse := ErrorResponse{
+			Error: string(errMsg),
+		}
+		json.NewEncoder(w).Encode(errResponse)
+		return
 	}
 
 	regData, err := dynamodbattribute.MarshalMap(regRequest)
@@ -59,7 +66,14 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		if err != nil {
 			fmt.Println("Error Creating AWS session")
-			fmt.Println(err.Error())
+			errMsg := err.Error()
+			fmt.Println(errMsg)
+			w.WriteHeader(500)
+			errResponse := ErrorResponse{
+				Error: string(errMsg),
+			}
+			json.NewEncoder(w).Encode(errResponse)
+			return
 		}
 
 		svc := dynamodb.New(sess)
@@ -82,11 +96,14 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if result.Item == nil {
-			msg := "Could not find '" + email[0] + "'"
+			errMsg := "Could not find '" + email[0] + "'"
+			fmt.Println(errMsg)
 			errResponse := ErrorResponse{
-				Error: string(msg),
+				Error: string(errMsg),
 			}
+			w.WriteHeader(500)
 			json.NewEncoder(w).Encode(errResponse)
+			return
 		}
 
 		var userRecord GetUserResponse
