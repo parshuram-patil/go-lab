@@ -2,10 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/servicediscovery"
 )
 
 type RegRequest struct {
@@ -98,4 +105,53 @@ func HandleCORS(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "OPTIONS" {
 		return
 	}
+}
+
+type ServiceDiscoryResponse struct {
+	InstanceIp   string `json:"instanceIp"`
+	InstancePort string `json:"instancePort"`
+}
+
+func discoverSerive(serviceName, namespaceName string) (*ServiceDiscoryResponse, *ErrorResponse) {
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("eu-west-1"),
+	})
+	if err != nil {
+		fmt.Println("Error Creating AWS session")
+		errMsg := err.Error()
+		fmt.Println(errMsg)
+		errResponse := ErrorResponse{
+			Error: string(errMsg),
+		}
+
+		return nil, &errResponse
+	}
+
+	svc := servicediscovery.New(sess)
+	input := &servicediscovery.DiscoverInstancesInput{
+		HealthStatus:  aws.String("HEALTHY"),
+		MaxResults:    aws.Int64(100),
+		NamespaceName: aws.String(namespaceName),
+		ServiceName:   aws.String(serviceName),
+	}
+
+	result, err := svc.DiscoverInstances(input)
+	if err != nil {
+		fmt.Println("Error in Discover instance for " + serviceName + " in " + namespaceName)
+		errMsg := err.Error()
+		fmt.Println(errMsg)
+		errResponse := ErrorResponse{
+			Error: string(errMsg),
+		}
+
+		return nil, &errResponse
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	noOfDiscoverdInstances := len(result.Instances)
+	attributes := result.Instances[rand.Intn(noOfDiscoverdInstances)].Attributes
+	return &ServiceDiscoryResponse{
+		InstanceIp:   *attributes["AWS_INSTANCE_IPV4"],
+		InstancePort: *attributes["AWS_INSTANCE_PORT"],
+	}, nil
 }

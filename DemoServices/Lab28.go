@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,8 +79,27 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	HandleCORS(w, r)
 	email := r.URL.Query()["email"]
 	if len(email) > 0 {
-		var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
-		var DB_SERVICE_PORT = getEvn("DB_SERVICE_PORT", "8092")
+		var DB_SERVICE_HOST string
+		var DB_SERVICE_PORT string
+		local := r.URL.Query()["local"]
+		localValue, _ := strconv.ParseBool(local[0])
+		if len(local) > 0 && localValue {
+			DB_SERVICE_HOST = "localhost"
+			DB_SERVICE_PORT = "8092"
+		} else {
+			serviceName := getEvn("SERVICE_NAME", "psp-db-api-service")
+			namespaceName := getEvn("NAMESPACE_NAME", "local")
+			dsResult, dsErr := discoverSerive(serviceName, namespaceName)
+			if dsErr != nil {
+				fmt.Println("Error calling Service Discovery Util")
+				w.WriteHeader(500)
+				json.NewEncoder(w).Encode(dsErr)
+				return
+			}
+			DB_SERVICE_HOST = dsResult.InstanceIp
+			DB_SERVICE_PORT = dsResult.InstancePort
+		}
+
 		resp, err := http.Get("http://" + DB_SERVICE_HOST + ":" + DB_SERVICE_PORT + "/user?email=" + email[0])
 
 		if err != nil {
@@ -130,10 +150,26 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ServiceDiscoveryHandler(w http.ResponseWriter, r *http.Request) {
+	HandleCORS(w, r)
+	var SERVICE_NAME = getEvn("SERVICE_NAME", "psp-db-api-service")
+	var NAMESPACE_NAME = getEvn("NAMESPACE_NAME", "local")
+	result, err := discoverSerive(SERVICE_NAME, NAMESPACE_NAME)
+	if err != nil {
+		fmt.Println("Error calling Service Discovery Util")
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
 func registraionService() {
 	http.HandleFunc("/registration", RegistrationHandler)
 	http.HandleFunc("/health", HeathHandler)
 	http.HandleFunc("/user", UserHandler)
+	http.HandleFunc("/service", ServiceDiscoveryHandler)
 	var HOST_PORT = getEvn("HOST_PORT", "8091")
 	fmt.Printf("sever starting on " + HOST_PORT + "\n")
 	log.Fatal(http.ListenAndServe(":"+HOST_PORT, nil))
