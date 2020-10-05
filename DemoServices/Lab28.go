@@ -87,8 +87,8 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			DB_SERVICE_HOST = "localhost"
 			DB_SERVICE_PORT = "8092"
 		} else {
-			serviceName := getEvn("SERVICE_NAME", "psp-db-api-service")
-			namespaceName := getEvn("NAMESPACE_NAME", "local")
+			serviceName := getEvn("DB_SERVICE_NAME", "psp-db-api-service")
+			namespaceName := getEvn("DB_SERVICE_NAMESPACE", "local")
 			dsResult, dsErr := discoverSerive(serviceName, namespaceName)
 			if dsErr != nil {
 				fmt.Println("Error calling Service Discovery Util")
