@@ -43,8 +43,30 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var DB_SERVICE_HOST = getEvn("DB_SERVICE_HOST", "localhost")
-	var DB_SERVICE_PORT = getEvn("DB_SERVICE_PORT", "8092")
+	var DB_SERVICE_HOST string
+	var DB_SERVICE_PORT string
+	local := r.URL.Query()["local"]
+	var localValue = false
+	if len(local) > 0 {
+		localValue, _ = strconv.ParseBool(local[0])
+	}
+	if localValue {
+		DB_SERVICE_HOST = "localhost"
+		DB_SERVICE_PORT = "8092"
+	} else {
+		serviceName := getEvn("DB_SERVICE_NAME", "psp-db-api-service")
+		namespaceName := getEvn("DB_SERVICE_NAMESPACE", "local")
+		dsResult, dsErr := discoverSerive(serviceName, namespaceName)
+		if dsErr != nil {
+			fmt.Println("Error calling Service Discovery Util")
+			w.WriteHeader(500)
+			json.NewEncoder(w).Encode(dsErr)
+			return
+		}
+		DB_SERVICE_HOST = dsResult.InstanceIp
+		DB_SERVICE_PORT = dsResult.InstancePort
+	}
+
 	resp, err := http.Post("http://"+DB_SERVICE_HOST+":"+DB_SERVICE_PORT+"/registration", "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		fmt.Println("Error calling registration API")
@@ -82,8 +104,11 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		var DB_SERVICE_HOST string
 		var DB_SERVICE_PORT string
 		local := r.URL.Query()["local"]
-		localValue, _ := strconv.ParseBool(local[0])
-		if len(local) > 0 && localValue {
+		var localValue = false
+		if len(local) > 0 {
+			localValue, _ = strconv.ParseBool(local[0])
+		}
+		if localValue {
 			DB_SERVICE_HOST = "localhost"
 			DB_SERVICE_PORT = "8092"
 		} else {
