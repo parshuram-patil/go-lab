@@ -20,7 +20,7 @@ func RegistrationDaoHandler(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &regRequest)
 
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-1"),
+		Region: aws.String("eu-central-1"),
 	})
 	if err != nil {
 		fmt.Println("Error Creating AWS session")
@@ -62,7 +62,7 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query()["email"]
 	if len(email) > 0 {
 		sess, err := session.NewSession(&aws.Config{
-			Region: aws.String("eu-west-1"),
+			Region: aws.String("eu-central-1"),
 		})
 		if err != nil {
 			fmt.Println("Error Creating AWS session")

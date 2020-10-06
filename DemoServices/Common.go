@@ -114,7 +114,7 @@ type ServiceDiscoryResponse struct {
 
 func discoverSerive(serviceName, namespaceName string) (*ServiceDiscoryResponse, *ErrorResponse) {
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-1"),
+		Region: aws.String("eu-central-1"),
 	})
 	if err != nil {
 		fmt.Println("Error Creating AWS session")
