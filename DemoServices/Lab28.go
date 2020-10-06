@@ -54,8 +54,8 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		DB_SERVICE_HOST = "localhost"
 		DB_SERVICE_PORT = "8092"
 	} else {
-		serviceName := getEvn("DB_SERVICE_NAME", "psp-db-api-service")
-		namespaceName := getEvn("DB_SERVICE_NAMESPACE", "local")
+		serviceName := getEvn("DB_SERVICE_NAME", "db-service")
+		namespaceName := getEvn("DB_SERVICE_NAMESPACE", "demoapp")
 		dsResult, dsErr := discoverSerive(serviceName, namespaceName)
 		if dsErr != nil {
 			fmt.Println("Error calling Service Discovery Util")
@@ -112,8 +112,8 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 			DB_SERVICE_HOST = "localhost"
 			DB_SERVICE_PORT = "8092"
 		} else {
-			serviceName := getEvn("DB_SERVICE_NAME", "psp-db-api-service")
-			namespaceName := getEvn("DB_SERVICE_NAMESPACE", "local")
+			serviceName := getEvn("DB_SERVICE_NAME", "db-service")
+			namespaceName := getEvn("DB_SERVICE_NAMESPACE", "demoapp")
 			dsResult, dsErr := discoverSerive(serviceName, namespaceName)
 			if dsErr != nil {
 				fmt.Println("Error calling Service Discovery Util")
@@ -177,8 +177,8 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 
 func ServiceDiscoveryHandler(w http.ResponseWriter, r *http.Request) {
 	HandleCORS(w, r)
-	var SERVICE_NAME = getEvn("SERVICE_NAME", "psp-db-api-service")
-	var NAMESPACE_NAME = getEvn("NAMESPACE_NAME", "local")
+	var SERVICE_NAME = getEvn("DB_SERVICE_NAME", "db-service")
+	var NAMESPACE_NAME = getEvn("DB_SERVICE_NAMESPACE", "demoapp")
 	result, err := discoverSerive(SERVICE_NAME, NAMESPACE_NAME)
 	if err != nil {
 		fmt.Println("Error calling Service Discovery Util")
